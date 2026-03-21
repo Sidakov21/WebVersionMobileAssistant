@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assist Goals — веб-версия</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand">Мобильный помощник</div>
+        <div class="topbar-actions">
+          <button class="icon-btn" aria-label="Меню">☰</button>
+          <button class="icon-btn" aria-label="Личный кабинет">👤</button>
+          <div class="goal-dropdown-wrap">
+            <button id="goalDropdownBtn" class="goal-dropdown-btn" aria-expanded="false">Цели ▾</button>
+            <ul id="goalDropdown" class="goal-dropdown" hidden></ul>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <section class="overview-grid">
+          <div id="radarsRow" class="radars-row"></div>
+
+          <aside class="analytics-card">
+            <h2 id="selectedGoalName">Цель 1</h2>
+            <p id="selectedGoalProgress" class="analytics-subtitle">Общий прогресс: 0%</p>
+            <h3>Активность за неделю</h3>
+            <div id="activityList"></div>
+            <div class="overview-actions">
+              <button class="action-btn primary">+ Создать цель</button>
+              <button class="action-btn secondary">＋ Добавить подцель</button>
+            </div>
+          </aside>
+        </section>
+
+        <section class="tasks-card">
+          <div class="tasks-toolbar">
+            <label class="search-box">
+              <span>🔎</span>
+              <input id="searchInput" type="text" placeholder="Поиск задач" />
+            </label>
+            <div class="sort-box">
+              <span>Сорт.</span>
+              <select id="sortSelect">
+                <option value="new">Новые</option>
+                <option value="progress">Прогресс</option>
+                <option value="az">А-Я</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="subgoalFilters" class="subgoal-filters"></div>
+
+          <div class="stats-row">
+            <span id="totalTasks">Всего задач: 0</span>
+            <span id="doneTasks">Выполнено: 0</span>
+          </div>
+
+          <div class="status-switch">
+            <button data-status="active" class="status-btn is-active">Активные</button>
+            <button data-status="completed" class="status-btn">Завершенные</button>
+          </div>
+
+          <div id="tasksList" class="tasks-list"></div>
+        </section>
+      </main>
+
+      <button class="fab" aria-label="Добавить задачу">+</button>
+
+      <footer class="footer">
+        <p>© 2026 Мобильный помощник. Планируй, отслеживай, достигай.</p>
+        <nav>
+          <a href="#">О проекте</a>
+          <a href="#">Поддержка</a>
+          <a href="#">Контакты</a>
+        </nav>
+      </footer>
+    </div>
+
+    <script src="./js/script.js"></script>
+  </body>
+</html>
