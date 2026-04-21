@@ -1,65 +1,29 @@
-const palette = {
+﻿const palette = {
   green: '#4fc35c',
   blue: '#2e9df0',
-  red: '#ff4a3f',
-  orange: '#ffab1f'
+  orange: '#ffab1f',
+  purple: '#9c27b0',
+  red: '#ff4a3f'
 };
 
-const goals = [
-  {
-    id: 'goal-1',
-    name: 'Цель 1',
-    radar: [66, 66, 75, 50, 100],
-    subgoals: ['Подцель 1', 'Подцель 2', 'Подцель 3', 'Подцель 4', 'Подцель 5'],
-    activities: [
-      { name: 'Подцель 1', done: 2, total: 3, color: palette.green },
-      { name: 'Подцель 2', done: 2, total: 3, color: palette.green },
-      { name: 'Подцель 3', done: 3, total: 4, color: palette.blue },
-      { name: 'Подцель 4', done: 1, total: 2, color: palette.red },
-      { name: 'Подцель 5', done: 1, total: 1, color: palette.orange }
-    ]
-  },
-  {
-    id: 'goal-2',
-    name: 'Изучение Kotlin',
-    radar: [82, 73, 67, 54, 39],
-    subgoals: ['Подцель 1', 'Подцель 2', 'Подцель 3'],
-    activities: [
-      { name: 'Синтаксис', done: 4, total: 5, color: palette.green },
-      { name: 'ООП', done: 3, total: 4, color: palette.blue },
-      { name: 'Android', done: 2, total: 4, color: palette.orange }
-    ]
-  },
-  {
-    id: 'goal-3',
-    name: 'Физическое развитие',
-    radar: [40, 64, 52, 68, 70],
-    subgoals: ['Кардио', 'Сон', 'Питание'],
-    activities: [
-      { name: 'Кардио', done: 2, total: 5, color: palette.red },
-      { name: 'Сон', done: 4, total: 6, color: palette.blue },
-      { name: 'Питание', done: 5, total: 7, color: palette.green }
-    ]
-  }
-];
+const subgoalColorOptions = [palette.green, palette.blue, palette.orange, palette.purple, palette.red];
+const modalState = { current: null, selectedSubgoalColor: palette.green };
 
-const allTasks = [
-  { id: 1, goalId: 'goal-1', name: 'Задача 3.4', subgoal: 'Подцель 3', progress: 0, date: '17.02.2026', status: 'active', createdOrder: 8, color: palette.blue },
-  { id: 2, goalId: 'goal-1', name: 'Задача 3.2', subgoal: 'Подцель 3', progress: 0, date: '17.02.2026', status: 'active', createdOrder: 7, color: palette.blue },
-  { id: 3, goalId: 'goal-1', name: 'Задача 1.3', subgoal: 'Подцель 1', progress: 0, date: '17.02.2026', status: 'active', createdOrder: 6, color: palette.green },
-  { id: 4, goalId: 'goal-1', name: 'Подцель 5', subgoal: 'Подцель 5', progress: 0, date: '17.02.2026', status: 'active', createdOrder: 5, color: palette.orange },
-  { id: 5, goalId: 'goal-1', name: 'Задача 2.2', subgoal: 'Подцель 2', progress: 100, date: '17.02.2026', status: 'completed', createdOrder: 4, color: palette.green },
-  { id: 6, goalId: 'goal-1', name: 'Задача 2.1', subgoal: 'Подцель 2', progress: 100, date: '17.02.2026', status: 'completed', createdOrder: 3, color: palette.green },
-  { id: 7, goalId: 'goal-2', name: 'Сделать mini-проект', subgoal: 'Подцель 3', progress: 70, date: '14.03.2026', status: 'active', createdOrder: 2, color: palette.orange },
-  { id: 8, goalId: 'goal-2', name: 'Пройти Kotlin Koans', subgoal: 'Подцель 1', progress: 100, date: '10.03.2026', status: 'completed', createdOrder: 1, color: palette.green }
-];
-
-let selectedGoalId = goals[0].id;
+let state = loadAppState();
+let selectedGoalId = state.goals[0]?.id ?? null;
 let selectedStatus = 'active';
 let selectedSubgoal = 'Все';
 
+function saveState() {
+  saveAppState(state);
+}
+
 function avgProgress(goal) {
-  return Math.round(goal.radar.reduce((a, v) => a + v, 0) / goal.radar.length);
+  return Math.round(goal.radar.reduce((sum, value) => sum + value, 0) / goal.radar.length);
+}
+
+function getSelectedGoal() {
+  return state.goals.find((goal) => goal.id === selectedGoalId);
 }
 
 function drawRadar(canvas, values, color = palette.green) {
@@ -73,9 +37,9 @@ function drawRadar(canvas, values, color = palette.green) {
   ctx.strokeStyle = 'rgba(162,176,184,0.25)';
   ctx.lineWidth = 1;
 
-  for (let ring = 1; ring <= 4; ring++) {
+  for (let ring = 1; ring <= 4; ring += 1) {
     ctx.beginPath();
-    for (let i = 0; i < labelsCount; i++) {
+    for (let i = 0; i < labelsCount; i += 1) {
       const angle = -Math.PI / 2 + (i * Math.PI * 2) / labelsCount;
       const x = cx + Math.cos(angle) * ((radius * ring) / 4);
       const y = cy + Math.sin(angle) * ((radius * ring) / 4);
@@ -88,12 +52,12 @@ function drawRadar(canvas, values, color = palette.green) {
   ctx.strokeStyle = color;
   ctx.lineWidth = 2;
   ctx.beginPath();
-  values.forEach((value, i) => {
-    const angle = -Math.PI / 2 + (i * Math.PI * 2) / labelsCount;
-    const r = (radius * value) / 100;
-    const x = cx + Math.cos(angle) * r;
-    const y = cy + Math.sin(angle) * r;
-    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  values.forEach((value, index) => {
+    const angle = -Math.PI / 2 + (index * Math.PI * 2) / labelsCount;
+    const currentRadius = (radius * value) / 100;
+    const x = cx + Math.cos(angle) * currentRadius;
+    const y = cy + Math.sin(angle) * currentRadius;
+    index ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
   });
   ctx.closePath();
   ctx.stroke();
@@ -101,13 +65,14 @@ function drawRadar(canvas, values, color = palette.green) {
 
 function renderDropdown() {
   const menu = document.getElementById('goalDropdown');
-  menu.innerHTML = goals
-    .map((g) => `<li><button data-goal-id="${g.id}">${g.name}</button></li>`)
+  menu.innerHTML = state.goals
+    .map((goal) => `<li><button data-goal-id="${goal.id}">${goal.name}</button></li>`)
     .join('');
 
-  menu.querySelectorAll('button').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      selectedGoalId = btn.dataset.goalId;
+  menu.querySelectorAll('button').forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedGoalId = button.dataset.goalId;
+      selectedSubgoal = 'Все';
       menu.hidden = true;
       document.getElementById('goalDropdownBtn').setAttribute('aria-expanded', 'false');
       renderAll();
@@ -115,10 +80,15 @@ function renderDropdown() {
   });
 }
 
+function goToGoal(goalId = selectedGoalId) {
+  if (!goalId) return;
+  window.location.href = `./goal.html?goalId=${encodeURIComponent(goalId)}`;
+}
+
 function renderRadars() {
   const row = document.getElementById('radarsRow');
-  const selectedGoal = goals.find((goal) => goal.id === selectedGoalId);
-  const remaining = goals.filter((goal) => goal.id !== selectedGoalId);
+  const selectedGoal = getSelectedGoal();
+  const remaining = state.goals.filter((goal) => goal.id !== selectedGoalId);
   const positioned = [
     { goal: remaining[0], slot: 'left' },
     { goal: selectedGoal, slot: 'center' },
@@ -127,9 +97,9 @@ function renderRadars() {
 
   row.innerHTML = positioned
     .map(({ goal, slot }) => {
-      const selected = goal.id === selectedGoalId;
+      const isSelected = goal.id === selectedGoalId;
       return `
-        <button class="radar-node ${slot} ${selected ? 'is-selected' : ''}" data-goal-id="${goal.id}">
+        <button class="radar-node ${slot} ${isSelected ? 'is-selected' : ''}" data-goal-id="${goal.id}">
           <canvas width="180" height="130"></canvas>
           <div class="radar-title">${goal.name}</div>
           <div class="radar-progress">${avgProgress(goal)}%</div>
@@ -139,47 +109,44 @@ function renderRadars() {
     .join('');
 
   row.querySelectorAll('.radar-node').forEach((card) => {
-    const goal = goals.find((item) => item.id === card.dataset.goalId);
+    const goal = state.goals.find((item) => item.id === card.dataset.goalId);
     drawRadar(card.querySelector('canvas'), goal.radar, goal.id === selectedGoalId ? palette.green : '#5ea8c4');
-    card.addEventListener('click', () => {
-      selectedGoalId = card.dataset.goalId;
-      selectedSubgoal = 'Все';
-      renderAll();
-    });
+    card.addEventListener('click', () => goToGoal(card.dataset.goalId));
   });
 }
 
 function renderAnalytics() {
-  const goal = goals.find((g) => g.id === selectedGoalId);
+  const goal = getSelectedGoal();
+  if (!goal) return;
+
   document.getElementById('selectedGoalName').textContent = goal.name;
   document.getElementById('selectedGoalProgress').textContent = `Общий прогресс: ${avgProgress(goal)}%`;
+  document.getElementById('goToGoalBtn').onclick = () => goToGoal(goal.id);
 
-  document.getElementById('activityList').innerHTML = goal.activities
-    .map((item) => {
-      const progress = Math.round((item.done / item.total) * 100);
-      return `
-      <div class="activity-row">
-        <div class="activity-head">
-          <span>${item.name}</span>
-          <span>${item.done} действий</span>
-        </div>
-        <div class="progress-track"><div class="progress-fill" style="width:${progress}%; background:${item.color}"></div></div>
-      </div>`;
-    })
-    .join('');
+  document.getElementById('activityList').innerHTML = goal.activities.length
+    ? goal.activities
+        .map((item) => {
+          const progress = item.total ? Math.round((item.done / item.total) * 100) : 0;
+          return `
+            <div class="activity-row">
+              <div class="activity-head">
+                <span>${item.name}</span>
+                <span>${item.done} действий</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:${progress}%; background:${item.color}"></div></div>
+            </div>`;
+        })
+        .join('')
+    : '<p>У этой цели пока нет подцелей и активности.</p>';
 }
 
 function filteredTasks() {
   const query = document.getElementById('searchInput').value.trim().toLowerCase();
   const sortBy = document.getElementById('sortSelect').value;
 
-  let list = allTasks.filter((task) => task.goalId === selectedGoalId && task.status === selectedStatus);
-  if (selectedSubgoal !== 'Все') {
-    list = list.filter((task) => task.subgoal === selectedSubgoal);
-  }
-  if (query) {
-    list = list.filter((task) => task.name.toLowerCase().includes(query) || task.subgoal.toLowerCase().includes(query));
-  }
+  let list = state.tasks.filter((task) => task.goalId === selectedGoalId && task.status === selectedStatus);
+  if (selectedSubgoal !== 'Все') list = list.filter((task) => task.subgoal === selectedSubgoal);
+  if (query) list = list.filter((task) => task.name.toLowerCase().includes(query) || task.subgoal.toLowerCase().includes(query));
 
   if (sortBy === 'az') list.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
   if (sortBy === 'progress') list.sort((a, b) => b.progress - a.progress);
@@ -189,9 +156,13 @@ function filteredTasks() {
 }
 
 function renderSubgoalFilters() {
-  const goal = goals.find((g) => g.id === selectedGoalId);
-  const filters = ['Все', ...goal.subgoals];
+  const goal = getSelectedGoal();
+  if (!goal) return;
+  const filters = ['Все', ...goal.subgoals.map((subgoal) => subgoal.name)];
   const container = document.getElementById('subgoalFilters');
+
+  if (!filters.includes(selectedSubgoal)) selectedSubgoal = 'Все';
+
   container.innerHTML = filters
     .map((label) => `<button class="chip" data-active="${selectedSubgoal === label}" data-subgoal="${label}">${label}</button>`)
     .join('');
@@ -206,34 +177,131 @@ function renderSubgoalFilters() {
 
 function taskCard(task) {
   return `
-  <article class="task-item ${task.status}">
-    <div class="task-top">
-      <h4 class="task-name">${task.name}</h4>
-      <div class="task-percent" style="background:${task.color}33; color:${task.color}">${task.progress}%</div>
-    </div>
-    <div class="tag-date">
-      <span class="tag" style="background:${task.color}26; color:${task.color}">${task.subgoal}</span>
-      <span>${task.date}</span>
-    </div>
-  </article>`;
+    <article class="task-item ${task.status}">
+      <div class="task-top">
+        <h4 class="task-name">${task.name}</h4>
+        <div class="task-percent" style="background:${task.color}33; color:${task.color}">${task.progress}%</div>
+      </div>
+      <p class="goal-card-note">${task.note || 'Без заметки'}</p>
+      <div class="tag-date">
+        <span class="tag" style="background:${task.color}26; color:${task.color}">${task.subgoal}</span>
+        <span>${task.date}</span>
+      </div>
+    </article>`;
 }
 
 function renderTasksArea() {
   renderSubgoalFilters();
   const tasks = filteredTasks();
-  const total = allTasks.filter((task) => task.goalId === selectedGoalId).length;
-  const done = allTasks.filter((task) => task.goalId === selectedGoalId && task.status === 'completed').length;
+  const total = state.tasks.filter((task) => task.goalId === selectedGoalId).length;
+  const done = state.tasks.filter((task) => task.goalId === selectedGoalId && task.status === 'completed').length;
 
   document.getElementById('totalTasks').textContent = `Всего задач: ${total}`;
   document.getElementById('doneTasks').textContent = `Выполнено: ${done}`;
   document.getElementById('tasksList').innerHTML = tasks.length ? tasks.map(taskCard).join('') : '<p>Нет задач по выбранным фильтрам.</p>';
 
-  document.querySelectorAll('.status-btn').forEach((btn) => {
-    btn.classList.toggle('is-active', btn.dataset.status === selectedStatus);
+  document.querySelectorAll('.status-btn').forEach((button) => {
+    button.classList.toggle('is-active', button.dataset.status === selectedStatus);
   });
 }
 
+function renderColorPicker() {
+  const picker = document.getElementById('subgoalColorPicker');
+  picker.innerHTML = subgoalColorOptions
+    .map((color) => {
+      const isSelected = modalState.selectedSubgoalColor === color;
+      return `<button type="button" class="color-option ${isSelected ? 'is-selected' : ''}" data-color="${color}" style="background:${color}" aria-label="Выбрать цвет ${color}"></button>`;
+    })
+    .join('');
+
+  picker.querySelectorAll('.color-option').forEach((button) => {
+    button.addEventListener('click', () => {
+      modalState.selectedSubgoalColor = button.dataset.color;
+      renderColorPicker();
+    });
+  });
+}
+
+function updateGoalSubmitState() {
+  document.getElementById('submitGoalBtn').disabled = document.getElementById('goalNameInput').value.trim().length === 0;
+}
+
+function updateSubgoalSubmitState() {
+  document.getElementById('submitSubgoalBtn').disabled = document.getElementById('subgoalNameInput').value.trim().length === 0;
+}
+
+function openModal(name) {
+  const overlay = document.getElementById('modalOverlay');
+  document.getElementById('goalModal').hidden = name !== 'goal';
+  document.getElementById('subgoalModal').hidden = name !== 'subgoal';
+  overlay.hidden = false;
+  document.body.classList.add('modal-open');
+  modalState.current = name;
+
+  if (name === 'goal') {
+    document.getElementById('goalForm').reset();
+    updateGoalSubmitState();
+  }
+
+  if (name === 'subgoal') {
+    document.getElementById('subgoalForm').reset();
+    modalState.selectedSubgoalColor = palette.green;
+    renderColorPicker();
+    updateSubgoalSubmitState();
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').hidden = true;
+  document.getElementById('goalModal').hidden = true;
+  document.getElementById('subgoalModal').hidden = true;
+  document.body.classList.remove('modal-open');
+  modalState.current = null;
+}
+
+function createGoal(name, description) {
+  const newGoal = {
+    id: `goal-${state.nextGoalId++}`,
+    name,
+    description,
+    radar: [0, 0, 0, 0, 0],
+    subgoals: [],
+    activities: []
+  };
+
+  state.goals.unshift(newGoal);
+  selectedGoalId = newGoal.id;
+  selectedSubgoal = 'Все';
+  selectedStatus = 'active';
+  saveState();
+}
+
+function createSubgoal(name, color) {
+  const goal = getSelectedGoal();
+  goal.subgoals.push({ name, color });
+  goal.activities.push({ name, done: 0, total: 0, color });
+
+  state.tasks.unshift({
+    id: state.nextTaskId++,
+    goalId: goal.id,
+    name,
+    subgoal: name,
+    progress: 0,
+    date: new Date().toLocaleDateString('ru-RU'),
+    status: 'active',
+    createdOrder: state.nextTaskId,
+    color,
+    note: ''
+  });
+
+  saveState();
+}
+
 function renderAll() {
+  state = loadAppState();
+  if (!state.goals.find((goal) => goal.id === selectedGoalId)) {
+    selectedGoalId = state.goals[0]?.id ?? null;
+  }
   renderDropdown();
   renderRadars();
   renderAnalytics();
@@ -241,31 +309,64 @@ function renderAll() {
 }
 
 function bindUi() {
-  const dropBtn = document.getElementById('goalDropdownBtn');
+  const dropButton = document.getElementById('goalDropdownBtn');
   const menu = document.getElementById('goalDropdown');
+  const overlay = document.getElementById('modalOverlay');
 
-  dropBtn.addEventListener('click', () => {
-    const open = menu.hidden;
-    menu.hidden = !open;
-    dropBtn.setAttribute('aria-expanded', String(open));
+  dropButton.addEventListener('click', () => {
+    const shouldOpen = menu.hidden;
+    menu.hidden = !shouldOpen;
+    dropButton.setAttribute('aria-expanded', String(shouldOpen));
   });
 
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.goal-dropdown-wrap')) {
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.goal-dropdown-wrap')) {
       menu.hidden = true;
-      dropBtn.setAttribute('aria-expanded', 'false');
+      dropButton.setAttribute('aria-expanded', 'false');
     }
   });
 
   document.getElementById('searchInput').addEventListener('input', renderTasksArea);
   document.getElementById('sortSelect').addEventListener('change', renderTasksArea);
 
-  document.querySelectorAll('.status-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      selectedStatus = btn.dataset.status;
+  document.querySelectorAll('.status-btn').forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedStatus = button.dataset.status;
       renderTasksArea();
     });
   });
+
+  document.getElementById('openGoalModalBtn').addEventListener('click', () => openModal('goal'));
+  document.getElementById('openSubgoalModalBtn').addEventListener('click', () => openModal('subgoal'));
+
+  document.querySelectorAll('[data-close-modal]').forEach((button) => button.addEventListener('click', closeModal));
+  overlay.addEventListener('click', (event) => { if (event.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && modalState.current) closeModal(); });
+
+  document.getElementById('goalNameInput').addEventListener('input', updateGoalSubmitState);
+  document.getElementById('subgoalNameInput').addEventListener('input', updateSubgoalSubmitState);
+
+  document.getElementById('goalForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = document.getElementById('goalNameInput').value.trim();
+    const description = document.getElementById('goalDescriptionInput').value.trim();
+    if (!name) return;
+    createGoal(name, description);
+    closeModal();
+    renderAll();
+  });
+
+  document.getElementById('subgoalForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = document.getElementById('subgoalNameInput').value.trim();
+    if (!name) return;
+    createSubgoal(name, modalState.selectedSubgoalColor);
+    selectedSubgoal = name;
+    closeModal();
+    renderAll();
+  });
+
+  renderColorPicker();
 }
 
 bindUi();

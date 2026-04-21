@@ -1,0 +1,134 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Цель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <div class="goal-page-shell">
+      <header class="goal-topbar">
+        <div class="goal-topbar-actions">
+          <button class="ghost-icon-btn" aria-label="Назад" id="backToIndexBtn">←</button>
+          <div>
+            <h1 id="goalPageTitle" class="goal-title">Цель</h1>
+            <p id="goalPageSubtitle" class="goal-subtitle">Детальный просмотр цели</p>
+          </div>
+        </div>
+        <button class="ghost-icon-btn" aria-label="Обновить" id="refreshGoalPageBtn">↻</button>
+      </header>
+
+      <main class="goal-main-content">
+        <section class="goal-hero">
+          <div class="goal-toolbar-stack">
+            <div class="goal-toolbar">
+              <label class="goal-search-box">
+                <span>🔎</span>
+                <input id="goalSearchInput" type="text" placeholder="Поиск задач" />
+              </label>
+              <div class="goal-sort-row">
+                <span class="goal-subtitle">Сортировка</span>
+                <div class="goal-sort-actions">
+                  <button class="sort-chip is-active" data-sort="new">Новые</button>
+                  <button class="sort-chip" data-sort="progress">Прогресс</button>
+                  <button class="sort-chip" data-sort="az">А-Я</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="goalSubgoalFilters" class="goal-subgoal-filters"></div>
+
+            <div class="goal-stats-row">
+              <span id="goalTotalTasks">Всего задач: 0</span>
+              <span id="goalDoneTasks">Выполнено: 0</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="goal-section">
+          <div class="goal-section-header">
+            <h2 class="section-title">Активные задачи</h2>
+            <span id="goalActiveCount" class="goal-subtitle"></span>
+          </div>
+          <div id="goalActiveTasks" class="goal-task-grid"></div>
+        </section>
+
+        <section class="goal-section">
+          <div class="goal-section-header">
+            <h2 class="section-title">Завершенные задачи</h2>
+            <span id="goalCompletedCount" class="goal-subtitle"></span>
+          </div>
+          <div id="goalCompletedTasks" class="goal-task-grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <button id="openTaskModalBtn" class="goal-fab" aria-label="Добавить задачу">+</button>
+
+    <div id="goalModalOverlay" class="modal-overlay" hidden>
+      <section id="taskCreateModal" class="app-modal sheet-modal" hidden aria-labelledby="taskCreateModalTitle">
+        <h2 id="taskCreateModalTitle" class="modal-title">Новая задача</h2>
+        <form id="taskCreateForm" class="modal-form">
+          <label class="outlined-field">
+            <span class="field-caption">Название задачи</span>
+            <input id="taskNameInput" type="text" maxlength="100" />
+          </label>
+          <label class="editor-field">
+            <span class="field-caption">Подцель</span>
+            <select id="taskSubgoalSelect"></select>
+          </label>
+          <label class="soft-field">
+            <textarea id="taskNoteInput" rows="4" maxlength="500" placeholder="Заметка (необязательно)"></textarea>
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="modal-link-btn" data-close-goal-modal>Отмена</button>
+            <button id="submitTaskBtn" type="submit" class="modal-submit-btn" disabled>Добавить</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="taskEditModal" class="app-modal sheet-modal" hidden aria-labelledby="taskEditModalTitle">
+        <div class="editor-header">
+          <h2 id="taskEditModalTitle" class="modal-title">Редактирование задачи</h2>
+          <button type="button" class="ghost-icon-btn" data-close-goal-modal>✕</button>
+        </div>
+        <form id="taskEditForm" class="editor-form">
+          <div class="editor-complete">
+            <input id="taskDoneCheckbox" class="editor-checkbox" type="checkbox" />
+            <label for="taskDoneCheckbox">Отметить как выполненную</label>
+          </div>
+
+          <div class="editor-panel">
+            <label class="editor-field">
+              <span class="field-caption">Название задачи</span>
+              <input id="taskEditNameInput" type="text" maxlength="100" />
+            </label>
+            <label class="editor-field">
+              <span class="field-caption">Подцель</span>
+              <select id="taskEditSubgoalSelect"></select>
+            </label>
+            <label class="editor-field">
+              <span class="field-caption">Заметка</span>
+              <textarea id="taskEditNoteInput" rows="7" maxlength="500"></textarea>
+            </label>
+          </div>
+
+          <div class="editor-actions">
+            <button id="deleteTaskBtn" type="button" class="editor-danger">Удалить</button>
+            <button id="saveTaskBtn" type="submit" class="editor-action">Сохранить</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <script src="./js/app-state.js"></script>
+    <script src="./js/goal.js"></script>
+  </body>
+</html>

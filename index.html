@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Assist Goals — веб-версия</title>
+    <title>Мобильный помощник</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -31,13 +31,18 @@
           <div id="radarsRow" class="radars-row"></div>
 
           <aside class="analytics-card">
-            <h2 id="selectedGoalName">Цель 1</h2>
-            <p id="selectedGoalProgress" class="analytics-subtitle">Общий прогресс: 0%</p>
+            <div class="analytics-head">
+              <div>
+                <h2 id="selectedGoalName">Цель 1</h2>
+                <p id="selectedGoalProgress" class="analytics-subtitle">Общий прогресс: 0%</p>
+              </div>
+              <button id="goToGoalBtn" class="action-btn tertiary">Перейти</button>
+            </div>
             <h3>Активность за неделю</h3>
             <div id="activityList"></div>
             <div class="overview-actions">
-              <button class="action-btn primary">+ Создать цель</button>
-              <button class="action-btn secondary">＋ Добавить подцель</button>
+              <button id="openGoalModalBtn" class="action-btn primary">+ Создать цель</button>
+              <button id="openSubgoalModalBtn" class="action-btn secondary">+ Добавить подцель</button>
             </div>
           </aside>
         </section>
@@ -86,7 +91,54 @@
       </footer>
     </div>
 
+    <div id="modalOverlay" class="modal-overlay" hidden>
+      <section id="goalModal" class="app-modal compact-modal" hidden aria-labelledby="goalModalTitle">
+        <h2 id="goalModalTitle" class="modal-title">Новая цель</h2>
+        <form id="goalForm" class="modal-form">
+          <label class="modal-field outlined-field">
+            <span class="field-caption">Название цели</span>
+            <input id="goalNameInput" name="goalName" type="text" maxlength="100" />
+          </label>
+
+          <label class="modal-field soft-field">
+            <textarea
+              id="goalDescriptionInput"
+              name="goalDescription"
+              rows="4"
+              maxlength="255"
+              placeholder="Описание (необязательно)"
+            ></textarea>
+          </label>
+
+          <div class="modal-actions">
+            <button type="button" class="modal-link-btn" data-close-modal="goal">Отмена</button>
+            <button id="submitGoalBtn" type="submit" class="modal-submit-btn" disabled>Создать</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="subgoalModal" class="app-modal compact-modal" hidden aria-labelledby="subgoalModalTitle">
+        <h2 id="subgoalModalTitle" class="modal-title">Новая подцель</h2>
+        <form id="subgoalForm" class="modal-form">
+          <label class="modal-field outlined-field">
+            <span class="field-caption">Название подцели</span>
+            <input id="subgoalNameInput" name="subgoalName" type="text" maxlength="100" />
+          </label>
+
+          <div class="color-picker-block">
+            <p class="color-picker-title">Выберите цвет:</p>
+            <div id="subgoalColorPicker" class="color-picker"></div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="modal-link-btn" data-close-modal="subgoal">Отмена</button>
+            <button id="submitSubgoalBtn" type="submit" class="modal-submit-btn" disabled>Создать</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <script src="./js/app-state.js"></script>
     <script src="./js/script.js"></script>
   </body>
 </html>
-
