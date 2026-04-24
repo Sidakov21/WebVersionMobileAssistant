@@ -17,8 +17,18 @@
       <header class="topbar">
         <div class="brand">Мобильный помощник</div>
         <div class="topbar-actions">
-          <button class="icon-btn" aria-label="Меню">☰</button>
-          <button class="icon-btn" aria-label="Личный кабинет">👤</button>
+          <div class="menu-dropdown-wrap">
+            <button id="menuBtn" class="icon-btn" aria-label="Меню">☰</button>
+            <ul id="menuDropdown" class="menu-dropdown" hidden>
+              <li><button id="menuResetBtn">🔄 Сбросить данные</button></li>
+              <li><button id="menuAboutBtn">ℹ️ О приложении</button></li>
+              <li><button id="menuStatsBtn">📊 Статистика</button></li>
+              <li><button id="menuExportBtn">💾 Экспорт данных</button></li>
+              <li><button id="menuThemeBtn">🌙 Тёмная тема</button></li>
+              <li><button id="menuHelpBtn">❓ Помощь</button></li>
+            </ul>
+          </div>
+          <button id="authOpenBtn" class="icon-btn" aria-label="Личный кабинет">👤</button>
           <div class="goal-dropdown-wrap">
             <button id="goalDropdownBtn" class="goal-dropdown-btn" aria-expanded="false">Цели ▾</button>
             <ul id="goalDropdown" class="goal-dropdown" hidden></ul>
@@ -83,12 +93,60 @@
 
       <footer class="footer">
         <p>© 2026 Мобильный помощник. Планируй, отслеживай, достигай.</p>
-        <nav>
-          <a href="#">О проекте</a>
-          <a href="#">Поддержка</a>
-          <a href="#">Контакты</a>
-        </nav>
+        <div class="footer-contacts">
+          <p>📧 support@mobilehelper.ru</p>
+          <p>📞 +7 (999) 123-45-67</p>
+        </div>
+        <div class="footer-social">
+          <a href="https://instagram.com/mobilehelper_app" target="_blank">Instagram</a>
+          <a href="https://vk.com/mobilehelper_official" target="_blank">VK</a>
+          <a href="https://t.me/mobilehelper_bot" target="_blank">Telegram</a>
+        </div>
       </footer>
+    </div>
+
+    <!-- Модальное окно авторизации -->
+    <div id="authModalOverlay" class="modal-overlay" hidden>
+      <section id="authModal" class="app-modal compact-modal" aria-labelledby="authModalTitle">
+        <div class="auth-tabs">
+          <button id="loginTabBtn" class="auth-tab active">Вход</button>
+          <button id="registerTabBtn" class="auth-tab">Регистрация</button>
+        </div>
+        <form id="loginForm" class="auth-form">
+          <h2 id="authModalTitle" class="modal-title">Вход</h2>
+          <label class="outlined-field">
+            <span class="field-caption">Email</span>
+            <input id="loginEmail" type="email" required />
+          </label>
+          <label class="outlined-field">
+            <span class="field-caption">Пароль</span>
+            <input id="loginPassword" type="password" required />
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="modal-link-btn" data-close-auth>Отмена</button>
+            <button type="submit" class="modal-submit-btn">Войти</button>
+          </div>
+        </form>
+        <form id="registerForm" class="auth-form" hidden>
+          <h2 class="modal-title">Регистрация</h2>
+          <label class="outlined-field">
+            <span class="field-caption">Имя</span>
+            <input id="registerName" type="text" required />
+          </label>
+          <label class="outlined-field">
+            <span class="field-caption">Email</span>
+            <input id="registerEmail" type="email" required />
+          </label>
+          <label class="outlined-field">
+            <span class="field-caption">Пароль</span>
+            <input id="registerPassword" type="password" required />
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="modal-link-btn" data-close-auth>Отмена</button>
+            <button type="submit" class="modal-submit-btn">Зарегистрироваться</button>
+          </div>
+        </form>
+      </section>
     </div>
 
     <div id="modalOverlay" class="modal-overlay" hidden>

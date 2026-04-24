@@ -673,3 +673,84 @@ body.modal-open { overflow: hidden; }
 
 .goal-task-card { border: 0; width: 100%; text-align: left; cursor: pointer; }
 
+/* === Меню (☰) === */
+.menu-dropdown-wrap { position: relative; }
+
+.menu-dropdown {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  width: 220px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: 12px;
+  background: #0f2a39;
+  border: 1px solid rgba(130, 209, 238, 0.3);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+  z-index: 9;
+}
+
+.menu-dropdown li button {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  padding: 10px;
+  border-radius: 8px;
+  color: var(--text);
+  background: transparent;
+  cursor: pointer;
+}
+
+.menu-dropdown li button:hover { background: rgba(130, 209, 238, 0.16); }
+
+/* === Футер === */
+.footer {
+  margin-top: 26px;
+  border-top: 1px solid rgba(130, 209, 238, 0.2);
+  padding-top: 14px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-contacts { display: flex; gap: 20px; }
+
+.footer-social { display: flex; gap: 16px; }
+
+.footer-social a { color: var(--accent); text-decoration: none; }
+
+.footer p { margin: 0; }
+
+/* === Модалка авторизации === */
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.auth-tab {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.auth-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: rgba(130, 209, 238, 0.08);
+}
+
+.auth-form {
+  display: grid;
+  gap: 18px;
+}

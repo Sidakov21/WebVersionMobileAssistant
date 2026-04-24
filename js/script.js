@@ -111,7 +111,22 @@ function renderRadars() {
   row.querySelectorAll('.radar-node').forEach((card) => {
     const goal = state.goals.find((item) => item.id === card.dataset.goalId);
     drawRadar(card.querySelector('canvas'), goal.radar, goal.id === selectedGoalId ? palette.green : '#5ea8c4');
-    card.addEventListener('click', () => goToGoal(card.dataset.goalId));
+
+    let clickTimer = null;
+    card.addEventListener('click', () => {
+      if (clickTimer) {
+        clearTimeout(clickTimer);
+        clickTimer = null;
+        goToGoal(card.dataset.goalId);
+      } else {
+        clickTimer = setTimeout(() => {
+          clickTimer = null;
+          selectedGoalId = card.dataset.goalId;
+          selectedSubgoal = 'Все';
+          renderAll();
+        }, 260);
+      }
+    });
   });
 }
 
@@ -280,20 +295,6 @@ function createSubgoal(name, color) {
   const goal = getSelectedGoal();
   goal.subgoals.push({ name, color });
   goal.activities.push({ name, done: 0, total: 0, color });
-
-  state.tasks.unshift({
-    id: state.nextTaskId++,
-    goalId: goal.id,
-    name,
-    subgoal: name,
-    progress: 0,
-    date: new Date().toLocaleDateString('ru-RU'),
-    status: 'active',
-    createdOrder: state.nextTaskId,
-    color,
-    note: ''
-  });
-
   saveState();
 }
 
@@ -367,6 +368,124 @@ function bindUi() {
   });
 
   renderColorPicker();
+
+  // === Меню ☰ ===
+  const menuBtn = document.getElementById('menuBtn');
+  const menuDropdown = document.getElementById('menuDropdown');
+
+  menuBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const shouldOpen = menuDropdown.hidden;
+    menuDropdown.hidden = !shouldOpen;
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.menu-dropdown-wrap')) {
+      menuDropdown.hidden = true;
+    }
+  });
+
+  document.getElementById('menuResetBtn').addEventListener('click', () => {
+    if (confirm('Сбросить все данные к начальным? Это действие нельзя отменить.')) {
+      resetAppState();
+      menuDropdown.hidden = true;
+      renderAll();
+    }
+  });
+
+  document.getElementById('menuAboutBtn').addEventListener('click', () => {
+    alert('Мобильный помощник v1.0\n\nПриложение для постановки и отслеживания личных целей.\nРазработано как дипломный проект, 2026.');
+    menuDropdown.hidden = true;
+  });
+
+  document.getElementById('menuStatsBtn').addEventListener('click', () => {
+    const total = state.tasks.length;
+    const done = state.tasks.filter((t) => t.status === 'completed').length;
+    const goals = state.goals.length;
+    alert(`📊 Статистика\n\nЦелей: ${goals}\nЗадач всего: ${total}\nВыполнено: ${done}\nАктивных: ${total - done}`);
+    menuDropdown.hidden = true;
+  });
+
+  document.getElementById('menuExportBtn').addEventListener('click', () => {
+    const json = JSON.stringify(state, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mobile-helper-export.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    menuDropdown.hidden = true;
+  });
+
+  document.getElementById('menuThemeBtn').addEventListener('click', () => {
+    document.body.classList.toggle('light-theme');
+    const isLight = document.body.classList.contains('light-theme');
+    document.getElementById('menuThemeBtn').textContent = isLight ? '☀️ Светлая тема' : '🌙 Тёмная тема';
+    menuDropdown.hidden = true;
+  });
+
+  document.getElementById('menuHelpBtn').addEventListener('click', () => {
+    alert('❓ Помощь\n\n• Одиночный клик на диаграмму — выбрать цель\n• Двойной клик — перейти к задачам цели\n• «+ Добавить подцель» — добавляет подцель к текущей цели\n• «+ Создать цель» — создаёт новую цель\n\nПо вопросам: support@mobilehelper.ru');
+    menuDropdown.hidden = true;
+  });
+
+  // === Авторизация 👤 ===
+  const authOverlay = document.getElementById('authModalOverlay');
+  const loginTab = document.getElementById('loginTabBtn');
+  const registerTab = document.getElementById('registerTabBtn');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+
+  document.getElementById('authOpenBtn').addEventListener('click', () => {
+    authOverlay.hidden = false;
+    document.body.classList.add('modal-open');
+  });
+
+  function closeAuthModal() {
+    authOverlay.hidden = true;
+    document.body.classList.remove('modal-open');
+  }
+
+  authOverlay.addEventListener('click', (event) => {
+    if (event.target === authOverlay) closeAuthModal();
+  });
+
+  document.querySelectorAll('[data-close-auth]').forEach((btn) => btn.addEventListener('click', closeAuthModal));
+
+  loginTab.addEventListener('click', () => {
+    loginTab.classList.add('active');
+    registerTab.classList.remove('active');
+    loginForm.hidden = false;
+    registerForm.hidden = true;
+  });
+
+  registerTab.addEventListener('click', () => {
+    registerTab.classList.add('active');
+    loginTab.classList.remove('active');
+    registerForm.hidden = false;
+    loginForm.hidden = true;
+  });
+
+  loginForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    alert(`✅ Добро пожаловать, ${email}!\n\n(Демо-режим: авторизация не реализована на бэкенде)`);
+    closeAuthModal();
+  });
+
+  registerForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = document.getElementById('registerName').value.trim();
+    alert(`🎉 Аккаунт для ${name} создан!\n\n(Демо-режим: регистрация не реализована на бэкенде)`);
+    closeAuthModal();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      if (!authOverlay.hidden) closeAuthModal();
+    }
+  });
 }
 
 bindUi();
